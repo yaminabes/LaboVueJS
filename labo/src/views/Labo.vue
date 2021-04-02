@@ -20,20 +20,6 @@ export default {
 }
 </script>
 <style scoped>
-.banner {
-  min-height: 50px;
-}
 
-#lab {
-  max-width: 1280px;
-  padding: 0 80px;
-  margin: 0 auto;
-}
-
-@media screen and (max-width: 900px){
-  #lab {
-    padding: unset;
-  }
-}
 
 </style>
