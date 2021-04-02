@@ -22,8 +22,7 @@ class Virus {
     if (this.virulence.length != 0) {
       this.virulence.splice(0,this.virulence.length);
     }
-
-    this.updateTemperature()
+    this.updateTemperature();
     this.virulenceCoeur();
     this.virulencePoumon();
     this.virulenceRein();
@@ -38,8 +37,6 @@ class Virus {
      - tMin = max (-2*nombre_de_A, -50)
      - tMax = max( 3*nombre_de_D, 100)
      */
-
-    // A COMPLETER
     this.temperature = [ tMin, tMax];
   }
 
@@ -58,12 +55,28 @@ class Virus {
     - virulence = 4*(1/sqrt(4-1)) = 2.3
 
     */
-
-    // A COMPLETER
-
+    const rexp = RegExp('AB','g');
+    let nb = 0;
+    let dist = 0;
+    let lastPos = -1;
+    // eslint-disable-next-line no-unused-vars
+    let res;
+    while ( (res = rexp.exec(this.code)) !== null) {
+      if (lastPos == -1) {
+        lastPos = rexp.lastIndex-2;
+      }
+      else {
+        dist += rexp.lastIndex-2 - lastPos;
+        lastPos = rexp.lastIndex-2;
+      }
+      nb += 1;
+    }
+    if (nb > 1) {
+      dist = dist/(nb-1);
+      level = (nb<10?nb:10)*(1.0/Math.sqrt(dist-1.0))
+    }
     this.virulence.push({organe:'coeur', niveau:level});
   }
-
   virulencePoumon() {
     let level = 0;
     /* regle de calcul :
@@ -77,12 +90,28 @@ class Virus {
     - M = 1.5^2 - 3/2 = 0.75
     - virulence  = min(10,M,0) = 0.75
     */
+    const rexp1 = RegExp('(BAD)+','g');
+    const rexp2 = RegExp('C+','g');
+    let maxBAD = 0;
+    let maxC = 0;
+    let res;
+    while ( (res = rexp1.exec(this.code)) !== null) {
+      if(res[0].length > maxBAD) {
+        maxBAD = res[0].length;
+      }
+    }
+    maxBAD = maxBAD/3;
 
-    // A COMPLETER
-
+    while ( (res = rexp2.exec(this.code)) !== null) {
+      if(res[0].length > maxC) {
+        maxC = res[0].length;
+      }
+    }
+    let m = Math.pow(1.5,maxBAD) - (maxC/2.0);
+    if (m>10) level = 10;
+    else if (m>0) level = m;
     this.virulence.push({organe:'poumon', niveau:level});
   }
-
   virulenceRein() {
     let level = 0;
     /* regle de calcul :
@@ -95,8 +124,24 @@ class Virus {
     - M =  ((3+4)/2) -1 = 2.5
     - virulence  = min(10,M) = 2.5
     */
-
-    // A COMPLETER
+    const rexp1 = RegExp('B+','g');
+    const rexp2 = RegExp('D+','g');
+    let maxB = 0;
+    let maxD = 0;
+    let res;
+    while ( (res = rexp1.exec(this.code)) !== null) {
+      if(res[0].length > maxB) {
+        maxB = res[0].length;
+      }
+    }
+    while ( (res = rexp2.exec(this.code)) !== null) {
+      if(res[0].length > maxD) {
+        maxD = res[0].length;
+      }
+    }
+    if ((maxB>=2)&&(maxD>=2)) {
+      level = (maxB+maxD)/2.0;
+    }
 
     this.virulence.push({organe:'rein', niveau:level});
   }
@@ -127,9 +172,7 @@ class Virus {
 
     this.virulence.push({organe:'cerveau', niveau:level});
   }
-
   updateMortalite() {
-
     let m = 0;
     /* regle de calcul :
     - M = 2 * somme des 4 valeurs de virulence
@@ -139,9 +182,15 @@ class Virus {
     - sinon si virCoeur>=3 ET virCerveau>=3, m += 5
     mortalite = m
     */
-
-    // A COMPLETER
-
+    let virCoeur = this.virulence.find(el => el.organe == 'coeur').niveau;
+    let virPoumon = this.virulence.find(el => el.organe == 'poumon').niveau;
+    let virRein = this.virulence.find(el => el.organe == 'rein').niveau;
+    let virCerveau = this.virulence.find(el => el.organe == 'cerveau').niveau;
+    m = 2.0*(virCoeur+virPoumon+virRein+virCerveau);
+    if ((virPoumon>=6)&&(virRein>=6)) m += 10;
+    else if ((virPoumon>=3)&&(virRein>=3)) m += 5;
+    if ((virCoeur>=6)&&(virCerveau>=6)) m += 10;
+    else if ((virCoeur>=3)&&(virCerveau>=3)) m += 5;
     this.mortalite = m;
   }
 
@@ -157,5 +206,6 @@ viruses.push(new Virus(1,"adeno","ABABABABABAB"));
 viruses.push(new Virus(2,"covid","ABADBADCCCBADCB"));
 viruses.push(new Virus(3,"staphy","ABBCDDDDCBBB"));
 viruses.push(new Virus(4,"prillon","ABCACACABCAB"));
+
 
 export { Virus, viruses };
