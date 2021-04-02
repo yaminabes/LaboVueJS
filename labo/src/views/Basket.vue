@@ -13,7 +13,7 @@
 
 <script>
 
-  import {Virus} from "../model";
+  import {Virus} from "@/model";
 
   export default {
     name: 'Basket',
@@ -30,8 +30,8 @@
       }
     },
     watch: {
-      operation(to, from) {
-        if (to == 'addbasket') {
+      operation(to) {
+        if (to === 'addbasket') {
           this.basket.push(new Virus(0,this.name, this.code))
           this.$router.push({path:'/library/view'})
         }

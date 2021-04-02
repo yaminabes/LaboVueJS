@@ -1,44 +1,42 @@
 <template>
   <div id="app">
     <NavBar :titles="titles" />
-    <keep-alive>
-    <router-view name="locCentral" :samples="samples" :collec="collec" @send-lab="receiveVirus($event)" @store-virus="collec.push($event)"></router-view>
-    </keep-alive>
+    <router-view name="locCentral" :collec="viruses" :samples="samples"></router-view>
   </div>
 </template>
-
 <script>
-  import NavBar from './components/NavBar.vue'
-  import {viruses} from './model.js'
-
-  export default {
-    name: 'App',
-    data : () => {
-      return {
-        titles : [ { text: "Home", color:"black", path:"/home"}, { text: "Lab", color:"blue", path:"/labo/slice"}, { text: "Library", color:"red", path:"/library/view"} ],
-        currentMenu : 0,
-        samples : [],
-        collec : viruses
-      }
-    },
-    components: {
-      NavBar
-    },
-    methods: {
-      receiveVirus : function(viruses) {
-        viruses.forEach(v => this.samples.push(v));
-      }
+import NavBar from './components/NavBar'
+import vuex from 'vuex'
+export default {
+  name: 'App',
+  data : () => {
+    return {
+      titles : [
+        { text: "Home", color:"#0a0a14", path:"/home"},
+        { text: "Lab", color:"#0a0a14", path:"/labo/slice"},
+        { text: "Library", color:"#0a0a14", path:"/library/view"},
+      ],
+      currentMenu : 0,
     }
+  },
+  components: {
+    NavBar
+  },
+  computed: {
+    ...vuex.mapGetters(['viruses', 'samples']),
   }
+}
 </script>
-
 <style>
+* {
+  font-family: Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media screen and (max-width: 900px){
   #app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
-    margin-top: 60px;
+    padding: unset;
   }
+}
 </style>
