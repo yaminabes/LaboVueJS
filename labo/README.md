@@ -1,4 +1,4 @@
-# projet-labo
+# labo
 
 ## Project setup
 ```
